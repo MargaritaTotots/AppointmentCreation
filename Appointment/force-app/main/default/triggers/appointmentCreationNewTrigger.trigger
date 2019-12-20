@@ -1,27 +1,29 @@
 trigger appointmentCreationNewTrigger on Appointment__c (before insert) {
-    List<Appointment__c> newList = Trigger.New;
-    Account newAccount;
-    Set<String> nameSet = new Set<String>();
-    List<Appointment__c> newAppointment = new List<Appointment__c>();
-    List<Account> accounts = [Select id, Name From Account];
-    List<Account> newAccounts = new List<Account>();
-    Integer i = 0;
+   Set<String> accountNameSet = new Set<String>();
     
-    for(Account account : accounts){
-        nameSet.add(account.Name);
+    for(Appointment__c appointment : Trigger.New){
+        accountNameSet.add(appointment.Account_Name__c);
     }
     
-    for(Appointment__c a : newList){
-        if(!nameSet.contains(a.Account_Name__c)){
-            newAccount = new Account(Name = a.Account_Name__c);
+    List<Account> accounts = [Select id, Name From Account Where Name IN :accountNameSet];
+    Set<String> accountSet = new Set<String>();
+    
+    for(Account account : accounts){
+        accountSet.add(account.Name);
+    }
+    
+    List<Account> newAccounts = new List<Account>();
+    List<Appointment__c> newAppointments = new List<Appointment__c>();
+    
+    for(Appointment__c appointment : Trigger.New){
+        if(!accountSet.contains(appointment.Account_Name__c)){
+            Account newAccount = new Account(Name = appointment.Account_Name__c);
             newAccounts.add(newAccount);
-            newAppointment.add(a);
-            System.debug('Account with Name = ' + newAccount.Name);
-        }
-        else{
+            newAppointments.add(appointment);
+        }else{
             for(Account account: accounts){
-                if(account.Name.equals(a.Account_Name__c)){
-                    a.Account_Id__c = account.Id;
+                if(account.Name.equals(appointment.Account_Name__c)){
+                    appointment.Account_Id__c = account.Id;
                     break;
                 }
             }
@@ -30,8 +32,10 @@ trigger appointmentCreationNewTrigger on Appointment__c (before insert) {
     
     insert newAccounts;
     
-    for(Appointment__c a : newAppointment){
-        a.Account_Id__c = newAccounts[i].Id;
+    Integer i = 0;
+    
+    for(Appointment__c appointment : newAppointments){
+        appointment.Account_Id__c = newAccounts[i].Id;
         i++;
     }
 }
