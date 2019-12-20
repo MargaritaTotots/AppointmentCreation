@@ -1,22 +1,23 @@
 trigger appointmentCreationNewTrigger on Appointment__c (before insert) {
-   Set<String> accountNameSet = new Set<String>();
+ 
+    Set<String> appointmentAccountNameSet = new Set<String>();
     
     for(Appointment__c appointment : Trigger.New){
-        accountNameSet.add(appointment.Account_Name__c);
+        appointmentAccountNameSet.add(appointment.Account_Name__c);
     }
     
-    List<Account> accounts = [Select id, Name From Account Where Name IN :accountNameSet];
-    Set<String> accountSet = new Set<String>();
+    List<Account> accounts = [Select id, Name From Account Where Name IN :appointmentAccountNameSet];
+    Set<String> accountNameSet = new Set<String>();
     
     for(Account account : accounts){
-        accountSet.add(account.Name);
+        accountNameSet.add(account.Name);
     }
     
     List<Account> newAccounts = new List<Account>();
     List<Appointment__c> newAppointments = new List<Appointment__c>();
     
     for(Appointment__c appointment : Trigger.New){
-        if(!accountSet.contains(appointment.Account_Name__c)){
+        if(!accountNameSet.contains(appointment.Account_Name__c)){
             Account newAccount = new Account(Name = appointment.Account_Name__c);
             newAccounts.add(newAccount);
             newAppointments.add(appointment);
