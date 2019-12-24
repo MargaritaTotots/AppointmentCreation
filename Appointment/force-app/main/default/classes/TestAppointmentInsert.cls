@@ -1,7 +1,6 @@
 @isTest
 private with sharing class TestAppointmentInsert {
-
-      @isTest static void testAppointmentCreationNewTriggerNewAccount(){
+    @isTest static void testAppointmentCreationNewTriggerNewAccount(){
         Appointment__c appointment = new Appointment__c();
         
         appointment.Name = 'New Test Appointment';
@@ -32,6 +31,10 @@ private with sharing class TestAppointmentInsert {
     }
     
     @isTest static void testAppointmentCreationNewTriggerExistAccount(){
+        Account account = new Account(Name = 'Exist Account');
+        
+        insert account;
+        
         Appointment__c appointment = new Appointment__c();
         
         appointment.Name = 'New Appointment';
@@ -40,16 +43,17 @@ private with sharing class TestAppointmentInsert {
         appointment.Appointment_Date__c = Date.newInstance(2019, 12, 19);
         appointment.Start_Time__c = Time.newInstance(12, 30, 0, 0);
         appointment.End_Time__c = Time.newInstance(13, 0, 0, 0);
-        appointment.Account_Name__c = 'New Account';
+        appointment.Account_Name__c = 'Exist Account';
         
         insert appointment;
         
         Appointment__c actualValue = [SELECT Id, Name, Client_First_Name__c,Client_Last_Name__c, 
-                                      Appointment_Date__c, Start_Time__c, End_Time__c, Account_Name__c 
+                                      Appointment_Date__c, Start_Time__c, End_Time__c, Account_Name__c, Account_Id__c 
                                       FROM  Appointment__c 
                                       WHERE Id = :appointment.Id 
                                       LIMIT 1 ];
         
-        System.assertEquals(appointment, actualValue);
+        System.assertEquals(account.Id, actualValue.Account_Id__c);
+        System.assertEquals(appointment.Id, actualValue.Id);
     }
 }

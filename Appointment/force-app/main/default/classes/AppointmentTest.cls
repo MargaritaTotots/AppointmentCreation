@@ -1,7 +1,7 @@
 @isTest
 private with sharing class AppointmentTest {
        
-    @isTest static void testDoPost(){
+     @isTest static void testDoPost(){
         Appointment__c appointment = new Appointment__c();
         
         appointment.Name = 'New Appointment';
@@ -12,15 +12,9 @@ private with sharing class AppointmentTest {
         appointment.End_Time__c = Time.newInstance(13, 0, 0, 0);
         appointment.Account_Name__c = 'New Account';
         
-        AppointmentRest.doPost(appointment);
+        Map<String, Object> response = (Map<String, Object>) JSON.deserializeUntyped(AppointmentRest.doPost(appointment));  
         
-        Appointment__c actualValue = [SELECT Id, Name, Client_First_Name__c, Client_Last_Name__c,
-                                      Appointment_Date__c, Start_Time__c, End_Time__c, Account_Name__c
-                                      FROM Appointment__c
-                                      WHERE Id = :appointment.Id
-                                      LIMIT 1 ];
-        
-        System.assertEquals(appointment, actualValue);   
+        System.assertEquals(response.get('success'), true);  
     }
     
     @isTest static void testDoPostWithException(){
@@ -33,7 +27,9 @@ private with sharing class AppointmentTest {
         appointment.Start_Time__c = Time.newInstance(12, 30, 0, 0);
         appointment.End_Time__c = Time.newInstance(13, 0, 0, 0);
 
-        AppointmentRest.doPost(appointment);  
+        Map<String, Object> response = (Map<String, Object>) JSON.deserializeUntyped(AppointmentRest.doPost(appointment));  
+
+        System.assertEquals(response.get('success'), false);
     }
 
 }
