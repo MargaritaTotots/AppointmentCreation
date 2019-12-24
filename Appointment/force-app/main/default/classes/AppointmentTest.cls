@@ -8,7 +8,7 @@ private with sharing class AppointmentTest {
         Time appointmentEndTime = Time.newInstance(13, 0, 0, 0);
         Appointment__c appointment = new Appointment__c();
         boolean success = true;
-       // try{
+        try{
             appointment.Name = 'New Appointment';
             appointment.Client_First_Name__c = 'Peter';
             appointment.Client_Last_Name__c = 'Doe';
@@ -19,11 +19,11 @@ private with sharing class AppointmentTest {
             AppointmentRest.doPost(appointment);
             Appointment__c actualValue = [Select Id, Name, Client_First_Name__c,Client_Last_Name__c, Appointment_Date__c, Start_Time__c, End_Time__c, Account_Name__c From  Appointment__c WHERE Id = :appointment.Id Limit 1 ];
             System.assertEquals(appointment, actualValue);
-        /*} catch(Exception e){
+        } catch(Exception e){
             success = false;
         }finally{
             System.assert(success);
-        }*/
+        }
     }
 
 }
